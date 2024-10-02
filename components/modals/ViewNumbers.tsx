@@ -1,4 +1,8 @@
+import { useEffect, useState } from "react";
+
 import { numberArrayReducerAction, numbers } from "../charts/NumberChart";
+
+import { useAnimate } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -31,12 +35,42 @@ export default function ViewNumbers({
   numbers: numbers;
   dispatch: React.Dispatch<numberArrayReducerAction>;
 }) {
+  const [scope, animate] = useAnimate();
+
+  const [isAddNumberOpen, setIsAddNumberOpen] = useState(false);
+
+  // If the AddNumber modal is open, animate the current element.
+  // Move it up by 5% and scale it down to 90%.
+  // Also make it darker by changing the filter
+  // These numbers are arbitrary and can be adjusted.
+  //
+  // If it is closed, reset it.
+  useEffect(() => {
+    if (!scope.current) return;
+
+    if (isAddNumberOpen) {
+      animate(scope.current, {
+        transform: "translateX(-50%) translateY(-60%) scale(0.90)",
+        left: "50%",
+        top: "50%",
+        filter: "brightness(0.95)",
+      });
+    } else {
+      animate(scope.current, {
+        transform: "translateX(-50%) translateY(-50%) scale(1)",
+        left: "50%",
+        top: "50%",
+        filter: "brightness(1)",
+      });
+    }
+  }, [isAddNumberOpen, animate, scope]);
+
   return (
     <Dialog>
       <DialogTrigger asChild>
         <Button variant="outline">View Numbers</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md" ref={scope}>
         <DialogHeader>
           <DialogTitle>View Numbers</DialogTitle>
           <DialogDescription>
@@ -66,7 +100,12 @@ export default function ViewNumbers({
               Back
             </Button>
           </DialogClose>
-          <AddNumber dispatch={dispatch} />
+          <AddNumber
+            dispatch={dispatch}
+            open={isAddNumberOpen}
+            onOpenChange={setIsAddNumberOpen}
+            setOpen={setIsAddNumberOpen}
+          />
         </DialogFooter>
       </DialogContent>
     </Dialog>

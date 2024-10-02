@@ -21,8 +21,14 @@ import { Label } from "@/components/ui/label";
 
 export default function AddNumber({
   dispatch,
+  open,
+  onOpenChange,
+  setOpen,
 }: {
   dispatch: Dispatch<numberArrayReducerAction>;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  setOpen: (open: boolean) => void;
 }) {
   const [number, setNumber] = useState(0);
 
@@ -31,11 +37,14 @@ export default function AddNumber({
       type: "add_number",
       payload: number,
     });
+
+    // Close modal after adding the number
+    setOpen(false);
     setNumber(0);
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button variant="default">Add Number</Button>
       </DialogTrigger>
